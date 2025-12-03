@@ -1,0 +1,276 @@
+{
+  "info": {
+    "name": "DesafioAccenture Ajustado",
+    "_postman_id": "12345678-aaaa-bbbb-cccc-1234567890ab",
+    "description": "Fluxo completo ajustado: CreateUser, GenerateToken, Authorized, ListBooks, AddBooks, GetUser",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CreateUser",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/Account/v1/User",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "Account",
+            "v1",
+            "User"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userName\": \"usuarioTeste{{$timestamp}}\",\n  \"password\": \"Senha@12345\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = pm.response.json();",
+              "if (jsonData.userID) {",
+              "    pm.environment.set(\"userID\", jsonData.userID);",
+              "    pm.environment.set(\"userName\", jsonData.username);",
+              "    pm.environment.set(\"password\", \"Senha@12345\");",
+              "}",
+              "pm.test(\"Usu\u00e1rio criado com sucesso\", function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GenerateToken",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/Account/v1/GenerateToken",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "Account",
+            "v1",
+            "GenerateToken"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "    pm.environment.set(\"token\", jsonData.token);",
+              "}",
+              "pm.test(\"Token gerado com sucesso\", function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AuthorizedConfirmed",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/Account/v1/Authorized",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "Account",
+            "v1",
+            "Authorized"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = pm.response.json();",
+              "pm.test(\"Usu\u00e1rio autorizado\", function () {",
+              "    pm.expect(jsonData).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ListBooks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/BookStore/v1/Books",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "BookStore",
+            "v1",
+            "Books"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = pm.response.json();",
+              "if (jsonData.books && jsonData.books.length >= 2) {",
+              "    pm.environment.set(\"book1\", jsonData.books[0].isbn);",
+              "    pm.environment.set(\"book2\", jsonData.books[1].isbn);",
+              "}",
+              "pm.test(\"Lista de livros carregada\", function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AddBooks",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/BookStore/v1/Books",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "BookStore",
+            "v1",
+            "Books"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userID}}\",\n  \"collectionOfIsbns\": [\n    { \"isbn\": \"{{book1}}\" },\n    { \"isbn\": \"{{book2}}\" }\n  ]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Livros alugados com sucesso\", function () {",
+              "    pm.expect(pm.response.code).to.eql(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GetUserDetails",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "https://demoqa.com/Account/v1/User/{{userID}}",
+          "protocol": "https",
+          "host": [
+            "demoqa",
+            "com"
+          ],
+          "path": [
+            "Account",
+            "v1",
+            "User",
+            "{{userID}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let jsonData = pm.response.json();",
+              "pm.test(\"Usu\u00e1rio cont\u00e9m os livros alugados\", function () {",
+              "    pm.expect(jsonData.books.length).to.be.at.least(2);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

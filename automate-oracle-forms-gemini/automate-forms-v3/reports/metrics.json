@@ -1,0 +1,40 @@
+{
+  "test_runs": [
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.09,
+      "status": "FAILED",
+      "timestamp": "20251202_123642"
+    },
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.08,
+      "status": "FAILED",
+      "timestamp": "20251202_124200"
+    },
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.1,
+      "status": "FAILED",
+      "timestamp": "20251202_125128"
+    },
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.09,
+      "status": "FAILED",
+      "timestamp": "20251202_125156"
+    },
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.09,
+      "status": "FAILED",
+      "timestamp": "20251202_125938"
+    },
+    {
+      "name": "test_cadastro_sucesso",
+      "duration": 0.09,
+      "status": "FAILED",
+      "timestamp": "20251202_130511"
+    }
+  ]
+}

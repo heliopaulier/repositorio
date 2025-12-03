@@ -1,0 +1,80 @@
+# helpers.sikuli - common helper functions for Sikuli (Jython)
+# This file is meant to be imported or concatenated into Sikuli scripts.
+# It provides robust click/find wrappers that try template variants and save evidence on failures.
+
+import os, time, datetime, shutil
+# FindFailed is raised by Sikuli when find() fails
+# Sikuli provides the exception class in the environment
+# We'll reference it directly in try/except blocks.
+
+def safe_find_click(template_path, templates_dir=None, timeout=10):
+    \"\"\"Try to find and click a template. If not found, iterate over variants in templates/variants/<basename>/*.png.
+    Returns True on success, False on failure. On failure saves a screenshot evidence.\"\"\"
+    try:
+        # Try primary template first
+        wait(template_path, timeout)
+        click(template_path)
+        return True
+    except FindFailed:
+        # primary failed — try variants folder if available
+        if templates_dir is None:
+            templates_dir = os.path.dirname(template_path)
+        name = os.path.splitext(os.path.basename(template_path))[0]
+        variants_dir = os.path.join(templates_dir, 'variants', name)
+        if os.path.exists(variants_dir):
+            files = sorted([os.path.join(variants_dir,f) for f in os.listdir(variants_dir) if f.lower().endswith('.png')])
+            for v in files:
+                try:
+                    wait(v, timeout)
+                    click(v)
+                    return True
+                except FindFailed:
+                    continue
+        # If we reach here, no variant matched — save evidence and rethrow
+        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        evid = capture(SCREEN)
+        evid_dest = os.path.join(templates_dir, '..', 'evidencia', 'notfound_%s.png' % ts)
+        try:
+            shutil.move(evid, evid_dest)
+        except:
+            pass
+        # log and return False (do not raise to allow graceful handling)
+        print('safe_find_click: failed to find', template_path)
+        return False
+
+def safe_exists(template_path, templates_dir=None, timeout=5):
+    try:
+        if exists(template_path):
+            return True
+    except Exception:
+        pass
+    # try variants similarly
+    if templates_dir is None:
+        templates_dir = os.path.dirname(template_path)
+    name = os.path.splitext(os.path.basename(template_path))[0]
+    variants_dir = os.path.join(templates_dir, 'variants', name)
+    if os.path.exists(variants_dir):
+        for v in os.listdir(variants_dir):
+            if v.lower().endswith('.png'):
+                if exists(os.path.join(variants_dir, v)):
+                    return True
+    return False
+
+def safe_wait(template_path, timeout=10):
+    try:
+        wait(template_path, timeout)
+        return True
+    except FindFailed:
+        # try variants
+        templates_dir = os.path.dirname(template_path)
+        name = os.path.splitext(os.path.basename(template_path))[0]
+        variants_dir = os.path.join(templates_dir, 'variants', name)
+        if os.path.exists(variants_dir):
+            for v in os.listdir(variants_dir):
+                if v.lower().endswith('.png'):
+                    try:
+                        wait(os.path.join(variants_dir, v), timeout)
+                        return True
+                    except FindFailed:
+                        continue
+        return False

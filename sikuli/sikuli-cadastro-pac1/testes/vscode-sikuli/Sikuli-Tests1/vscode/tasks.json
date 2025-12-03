@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Executar SikuliX",
+        "type": "shell",
+        "command": "java",
+        "args": [
+          "-jar",
+          "C:\\SikuliX\\sikulixide-2.0.5.jar",
+          "-r",
+          "${file}"
+        ],
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }
+    ]
+  }
+  

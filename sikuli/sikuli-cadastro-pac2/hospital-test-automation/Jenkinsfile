@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                sh 'mvn clean compile'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'mvn test'
+            }
+        }
+        stage('Generate Reports') {
+            steps {
+                echo 'Generating test reports and metrics graph...'
+                sh 'mvn surefire-report:report'
+                sh 'python3 generate_report_graph.py'
+            }
+        }
+        stage('Archive Reports') {
+            steps {
+                echo 'Archiving test reports and graph...'
+                archiveArtifacts artifacts: 'target/surefire-reports/**, reports/*.png', fingerprint: true
+            }
+        }
+        // Adicionar mais stages conforme necessário, como 'Deploy' ou 'Notification'
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+            // Adicionar ações de notificação de sucesso aqui
+        }
+        failure {
+            echo 'Pipeline failed!'
+            // Adicionar ações de notificação de falha aqui
+        }
+    }
+}
+

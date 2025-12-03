@@ -1,0 +1,8 @@
+nome: Brenda Gomes
+cpf: 79690499904
+email: dmachado@example.org
+telefone: +55 84 6223-7272
+endereco: Vila Rios, 47, Nossa Senhora Aparecida, 71804137 Souza de Silveira / AM
+cidade: Mendonça
+estado: RO
+cep: 65054-742

@@ -1,0 +1,8 @@
+nome: Noah Mendes
+cpf: 13167956160
+email: da-mataana-carolina@example.org
+telefone: (031) 3985 0052
+endereco: Distrito Marcela Fogaça, Vila São Dimas, 98984-775 Macedo / AM
+cidade: Casa Grande
+estado: AC
+cep: 65420-920

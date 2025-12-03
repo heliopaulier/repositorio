@@ -1,0 +1,12 @@
+{
+  "name": "demoqa-tests",
+  "version": "1.0.0",
+  "devDependencies": {
+  "@badeball/cypress-cucumber-preprocessor": "^15.1.5",
+  "@bahmutov/cypress-esbuild-preprocessor": "^3.0.0",
+  "@faker-js/faker": "^8.0.0",
+  "cypress": "^12.17.3",
+  "esbuild": "^0.18.0"
+}
+  }
+

@@ -1,0 +1,6 @@
+NomePaciente=Dra. Ricardo Souza
+NomeMae=Patrícia Montenegro
+NomePai=Maria Souza
+Telefone=81 2474-5223
+CPF=604.581.515-72
+RG=2636770

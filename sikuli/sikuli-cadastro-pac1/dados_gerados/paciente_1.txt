@@ -1,0 +1,8 @@
+nome: Alexandre Vasconcelos
+cpf: 34177681873
+email: ana-cecilia45@example.org
+telefone: 71 7167-8697
+endereco: Alameda Castro, 2, Vila São Paulo, 57766-680 Campos / PB
+cidade: Rezende do Oeste
+estado: SC
+cep: 42156-294

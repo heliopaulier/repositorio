@@ -1,0 +1,6 @@
+NomePaciente=Dr. Juliana Montenegro
+NomeMae=Carlos Pereira
+NomePai=Patrícia Costa
+Telefone=98 1338-6516
+CPF=361.066.144-58
+RG=9860288

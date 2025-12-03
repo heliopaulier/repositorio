@@ -1,0 +1,7 @@
+com/hospital/tests/FakeDataGenerator.class
+com/hospital/tests/PatientSearchTest.class
+com/hospital/tests/PatientRegistrationTest.class
+com/hospital/tests/BaseSikuliTest.class
+com/hospital/tests/AppTest.class
+com/hospital/tests/PatientTestSuite.class
+com/hospital/tests/ExampleSikuliTest.class

@@ -1,0 +1,8 @@
+nome: Maria Luiza da Conceição
+cpf: 90804889090
+email: casa-grandemaysa@example.org
+telefone: +55 (061) 6769 4868
+endereco: Colônia José da Rosa, 39, Santa Terezinha, 71666312 Jesus de Novaes / PR
+cidade: Brito de Albuquerque
+estado: GO
+cep: 25928936

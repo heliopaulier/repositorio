@@ -1,0 +1,6 @@
+NomePaciente=Dr. Patrícia Pereira
+NomeMae=Maria Silva
+NomePai=Gabriel Moura
+Telefone=49 8586-7698
+CPF=384.068.219-30
+RG=7125660

@@ -1,0 +1,13 @@
+{
+  "firstName": "João",
+  "lastName": "Silva",
+  "email": "joao.silva@example.com",
+  "gender": "Male",
+  "mobile": "987654321",
+  "dateOfBirth": "10 Jan 1990",
+  "subjects": ["Maths", "English"],
+  "hobbies": ["Sports", "Reading"],
+  "address": "Rua Exemplo, 123 - São Paulo",
+  "state": "NCR",
+  "city": "Delhi"
+}
