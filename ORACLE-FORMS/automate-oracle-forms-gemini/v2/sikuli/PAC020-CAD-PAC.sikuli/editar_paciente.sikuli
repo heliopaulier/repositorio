@@ -1,0 +1,57 @@
+# editar_paciente.sikuli - uses safe_find_click to robustly edit first patient
+import os, time, json, subprocess, shutil
+BUNDLE = getBundlePath()
+TEMPLATES = os.path.join(BUNDLE,'templates')
+EVIDENCE = os.path.join(BUNDLE,'evidencia')
+LOGS = os.path.join(BUNDLE,'logs')
+IA_HELPER_PY = r"C:\automacao\ia_helper.py"  # adjust
+
+if not os.path.exists(EVIDENCE): os.makedirs(EVIDENCE)
+if not os.path.exists(LOGS): os.makedirs(LOGS)
+
+def log(msg):
+    print(msg)
+    with open(os.path.join(LOGS,'editar.log'),'a') as f:
+        f.write(msg+'\\n')
+
+def chamar_ocr(img_path):
+    try:
+        cmd = ['python', IA_HELPER_PY, 'ocr', img_path]
+        out = subprocess.check_output(cmd, shell=False)
+        return out.decode('utf-8').strip()
+    except Exception as e:
+        log('Erro OCR: %s' % e)
+        return ''
+
+# Use safe_find_click defined in helpers.sikuli (we assume included)
+# Search for first result, open, edit phone and save
+def editar_primeiro_paciente(novo_telefone):
+    try:
+        if not safe_find_click(os.path.join(TEMPLATES,'tela-inicial-busca-paciente.png'), TEMPLATES):
+            log('Tela inicial não encontrada'); return False
+        safe_find_click(os.path.join(TEMPLATES,'area-de-texto-busca.png'), TEMPLATES)
+        type('') # customize search value if needed
+        # click first result (template must exist)
+        if not safe_find_click(os.path.join(TEMPLATES,'primeiro-resultado-busca.png'), TEMPLATES):
+            log('Resultado de busca não encontrado'); return False
+        wait(os.path.join(TEMPLATES,'tela-pac-cad.png'), 10)
+        # edit telefone
+        if not safe_find_click(os.path.join(TEMPLATES,'campo-telefone-pac.png'), TEMPLATES):
+            log('Campo telefone não encontrado'); return False
+        doubleClick(os.path.join(TEMPLATES,'campo-telefone-pac.png'))
+        type(novo_telefone)
+        safe_find_click(os.path.join(TEMPLATES,'salvar-cadastro-de-paciente.png'), TEMPLATES)
+        time.sleep(3)
+        salvar = capture(SCREEN)
+        # move evidence
+        try:
+            shutil.move(salvar, os.path.join(EVIDENCE,'editar_'+time.strftime('%Y%m%d_%H%M%S')+'.png'))
+        except:
+            pass
+        return True
+    except Exception as e:
+        log('Erro editar: %s' % e)
+        return False
+
+if __name__ == '__main__':
+    editar_primeiro_paciente('15 99999-0000')

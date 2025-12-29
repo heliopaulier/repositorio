@@ -1,0 +1,2 @@
+class VisualElementNotFound(Exception):
+    pass

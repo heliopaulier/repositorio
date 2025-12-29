@@ -1,0 +1,9 @@
+jpype1>=1.4.1
+pillow
+pytest
+allure-pytest
+opencv-python-headless
+pytesseract
+numpy
+faker
+pytest-html
