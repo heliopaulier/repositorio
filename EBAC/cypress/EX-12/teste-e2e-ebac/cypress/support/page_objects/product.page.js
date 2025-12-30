@@ -1,143 +1,47 @@
 class ProductPage {
-  // ---------------- Helpers ----------------
-  botaoComprarEstaHabilitado($btn) {
-    return !($btn.is(':disabled') || $btn.hasClass('disabled'));
+  selecionarSwatchPorClasse(valor) {
+    // O plugin cria classes do tipo:
+    // button-variable-item-XS, button-variable-item-Green, button-variable-item-Red ...
+    const cls = `.button-variable-item-${valor}`;
+
+    cy.get(cls, { timeout: 20000 })
+      .first()
+      .scrollIntoView()
+      .click({ force: true });
+
+    cy.wait(250);
   }
 
-  getBotaoComprar() {
-    return cy.get('button.single_add_to_cart_button', { timeout: 20000 }).should('exist');
-  }
+  selecionarVariacao(size, color) {
+    // Seleciona Size e Color pelos swatches (classe do plugin)
+    // IMPORTANTE: respeita exatamente o texto esperado nas classes (XS, S, L, Green, White, Blue, Red)
+    this.selecionarSwatchPorClasse(size);
+    this.selecionarSwatchPorClasse(color);
 
-  // ---------------- Variações por BOTÕES (swatches) ----------------
-  configurarVariacoesPorBotoes() {
-    // Tentativa robusta: procurar as opções de Size e Color pelos rótulos
-    const getOptionsByLabel = (labelText) => {
-      // Tenta achar a linha da tabela de variações pelo rótulo (Size/Color)
-      // e dentro dela coletar as opções clicáveis.
-      const row = Cypress.$('.variations tr').filter((_, tr) =>
-        Cypress.$(tr).text().toLowerCase().includes(labelText.toLowerCase())
-      );
+    // Valida pelo estado REAL do WooCommerce (mais confiável do que classe selected)
+    cy.get('button.single_add_to_cart_button', { timeout: 20000 })
+      .should('exist')
+      .should(($btn) => {
+        const disabled = $btn.is(':disabled') || $btn.hasClass('disabled');
+        const needsSelection = $btn.hasClass('wc-variation-selection-needed');
+        const unavailable = $btn.hasClass('wc-variation-is-unavailable');
 
-      if (row.length) {
-        const $row = Cypress.$(row[0]);
-        const $opts = $row.find(
-          '.variable-item:not(.disabled):not(.outofstock), li.variable-item:not(.disabled):not(.outofstock), button.variable-item:not(.disabled)'
-        );
-        return $opts.toArray();
-      }
-
-      // Fallback: pega wrappers em ordem (se não achou por label)
-      const wrappers = Cypress.$(
-        '.variations .variable-items-wrapper, .woo-variation-items-wrapper .variable-items-wrapper, .variable-items-wrapper'
-      );
-      if (!wrappers.length) return [];
-
-      // labelText "size" -> primeiro wrapper, "color" -> segundo wrapper (fallback)
-      const idx = labelText.toLowerCase().includes('size') ? 0 : 1;
-      const $wrap = Cypress.$(wrappers.get(idx));
-      const $opts = $wrap.find(
-        '.variable-item:not(.disabled):not(.outofstock), li.variable-item:not(.disabled):not(.outofstock), button.variable-item:not(.disabled)'
-      );
-      return $opts.toArray();
-    };
-
-    cy.get('body').then(() => {
-      const sizeOptions = getOptionsByLabel('size');
-      const colorOptions = getOptionsByLabel('color');
-
-      if (!sizeOptions.length || !colorOptions.length) {
-        throw new Error(
-          'Não consegui identificar opções de Size/Color por botões. Verifique o DOM dos swatches (classe variable-item).'
-        );
-      }
-
-      // Tenta combinações até habilitar o botão
-      const tryCombo = (si, ci) => {
-        if (si >= sizeOptions.length) {
-          throw new Error('Nenhuma combinação de variação habilitou o botão Comprar (produto pode estar sem estoque).');
-        }
-
-        const sizeEl = sizeOptions[si];
-        const colorEl = colorOptions[ci];
-
-        cy.wrap(sizeEl).scrollIntoView().click({ force: true });
-        cy.wait(250);
-        cy.wrap(colorEl).scrollIntoView().click({ force: true });
-        cy.wait(400);
-
-        return this.getBotaoComprar().then(($btn) => {
-          if (this.botaoComprarEstaHabilitado($btn)) {
-            return; // sucesso
-          }
-
-          const nextCi = ci + 1;
-          if (nextCi < colorOptions.length) {
-            return tryCombo(si, nextCi);
-          }
-          return tryCombo(si + 1, 0);
-        });
-      };
-
-      return tryCombo(0, 0);
-    });
-  }
-
-  // ---------------- Variações por SELECT (fallback) ----------------
-  configurarVariacoesPorSelect() {
-    cy.get('.variations select').each(($select) => {
-      cy.wrap($select).then(($s) => {
-        const options = [...$s[0].options]
-          .filter((o) => o.value && o.value.trim().length > 0)
-          .map((o) => o.value);
-
-        if (!options.length) return;
-
-        cy.wrap($s).select(options[0], { force: true });
+        expect(needsSelection, 'Variação selecionada (não precisa mais selecionar)').to.eq(false);
+        expect(unavailable, 'Combinação disponível (não indisponível)').to.eq(false);
+        expect(disabled, 'Botão comprar habilitado').to.eq(false);
       });
-    });
-
-    // Só segue se habilitar (se não habilitar, deixa o erro claro)
-    this.getBotaoComprar().should(($btn) => {
-      const ok = this.botaoComprarEstaHabilitado($btn);
-      expect(ok, 'Botão comprar habilitado após selects').to.eq(true);
-    });
-  }
-
-  // ---------------- Public API ----------------
-  configurarVariacoesSeExistirem() {
-    cy.get('body').then(($body) => {
-      const hasSwatches =
-        $body.find('.variable-items-wrapper').length > 0 ||
-        $body.find('.woo-variation-items-wrapper').length > 0 ||
-        $body.find('.variable-item').length > 0;
-
-      const hasSelect = $body.find('.variations select').length > 0;
-
-      // IMPORTANTE: se houver swatches, prioriza swatches (mesmo que existam selects ocultos)
-      if (hasSwatches) {
-        this.configurarVariacoesPorBotoes();
-        return;
-      }
-
-      if (hasSelect) {
-        this.configurarVariacoesPorSelect();
-        return;
-      }
-
-      // Produto simples: não faz nada
-    });
   }
 
   definirQuantidade(qtd) {
-    cy.get('input.qty').clear({ force: true }).type(String(qtd), { force: true });
+    cy.get('input.qty', { timeout: 20000 })
+      .clear({ force: true })
+      .type(String(qtd), { force: true });
   }
 
   adicionarAoCarrinho() {
-    this.getBotaoComprar()
-      .should(($btn) => {
-        const ok = this.botaoComprarEstaHabilitado($btn);
-        expect(ok, 'Botão comprar habilitado antes do clique').to.eq(true);
-      })
+    cy.get('button.single_add_to_cart_button', { timeout: 20000 })
+      .should('exist')
+      .and('not.be.disabled')
       .click({ force: true });
   }
 

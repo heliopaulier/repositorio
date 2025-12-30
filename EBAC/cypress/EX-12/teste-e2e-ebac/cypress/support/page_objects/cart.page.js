@@ -1,17 +1,20 @@
 class CartPage {
-    validarCarrinhoComItens() {
-      // Tabela do carrinho padrão WooCommerce
-      cy.get('form.woocommerce-cart-form').should('be.visible');
-      cy.get('tr.woocommerce-cart-form__cart-item').should('have.length.greaterThan', 0);
-    }
-  
-    irParaCheckout() {
-      cy.get('a.checkout-button, a.wc-proceed-to-checkout a')
-        .first()
-        .should('be.visible')
-        .click();
-    }
+  validarCarrinhoComItens() {
+    cy.get('form.woocommerce-cart-form', { timeout: 20000 }).should('be.visible');
+    cy.get('tr.woocommerce-cart-form__cart-item', { timeout: 20000 })
+      .should('have.length.greaterThan', 0);
   }
-  
-  export default new CartPage();
-  
+
+  validarQuantidadeItens(quantidade) {
+    cy.get('tr.woocommerce-cart-form__cart-item', { timeout: 20000 })
+      .should('have.length', quantidade);
+  }
+
+  irParaCheckout() {
+    cy.get('a.checkout-button', { timeout: 20000 })
+      .should('be.visible')
+      .click();
+  }
+}
+
+export default new CartPage();
